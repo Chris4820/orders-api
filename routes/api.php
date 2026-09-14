@@ -14,3 +14,4 @@ Route::delete('/products/{product}', [ProductController::class, 'destroy']);
 //Order CRUD5
 Route::get('/orders', [OrderController::class, 'index']);
 Route::post('/orders', [OrderController::class, 'store']);
+Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel']);

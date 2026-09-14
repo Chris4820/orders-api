@@ -89,4 +89,33 @@ class OrderController extends Controller
             201
         );
     }
+
+
+    public function cancel(Order $order)
+    {
+        if ($order->status === 'cancelled') {
+            return response()->json([
+                'message' => 'Order is already cancelled.',
+            ], 422);
+        }
+
+        DB::transaction(function () use ($order) {
+            $order->load('items.product');
+
+            foreach ($order->items as $item) {
+                $item->product->increment(
+                    'stock',
+                    $item->quantity
+                );
+            }
+
+            $order->update([
+                'status' => 'cancelled',
+            ]);
+        });
+
+        return response()->json(
+            $order->fresh()->load('items.product')
+        );
+    }
 }

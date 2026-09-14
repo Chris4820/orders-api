@@ -2,11 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class CreateOrder extends TestCase
+class OrderTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -194,6 +195,116 @@ class CreateOrder extends TestCase
         ]);
 
         $this->assertDatabaseCount('orders', 0);
+
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'stock' => 10,
+        ]);
+    }
+
+    /**
+     * Testa o cancelamento de uma encomenda.
+     *
+     * Verifica que:
+     * - a API devolve HTTP 200;
+     * - o estado da encomenda passa para cancelled;
+     * - o stock do produto é reposto;
+     * - a encomenda continua existente na base de dados.
+     */
+    public function test_can_cancel_an_order_and_restore_stock(): void
+    {
+        $product = Product::create([
+            'name' => 'Teclado',
+            'price' => 50.00,
+            'stock' => 10,
+        ]);
+
+        $createResponse = $this->postJson('/api/orders', [
+            'customer_name' => 'João Silva',
+            'customer_email' => 'joao@example.com',
+            'products' => [
+                [
+                    'product_id' => $product->id,
+                    'quantity' => 2,
+                ],
+            ],
+        ]);
+
+        $createResponse->assertStatus(201);
+
+        $order = Order::first();
+
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'stock' => 8,
+        ]);
+
+        $response = $this->postJson(
+            "/api/orders/{$order->id}/cancel"
+        );
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'status' => 'cancelled',
+        ]);
+
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'stock' => 10,
+        ]);
+    }
+
+    /**
+     * Testa que uma encomenda não pode ser cancelada duas vezes.
+     *
+     * Verifica que:
+     * - a API devolve HTTP 422;
+     * - é devolvida uma mensagem de erro;
+     * - o stock não é alterado novamente.
+     */
+    public function test_cannot_cancel_an_already_cancelled_order(): void
+    {
+        $product = Product::create([
+            'name' => 'Teclado',
+            'price' => 50.00,
+            'stock' => 10,
+        ]);
+
+        $createResponse = $this->postJson('/api/orders', [
+            'customer_name' => 'João Silva',
+            'customer_email' => 'joao@example.com',
+            'products' => [
+                [
+                    'product_id' => $product->id,
+                    'quantity' => 2,
+                ],
+            ],
+        ]);
+
+        $createResponse->assertStatus(201);
+
+        $order = Order::first();
+
+        $this->postJson(
+            "/api/orders/{$order->id}/cancel"
+        )->assertStatus(200);
+
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'stock' => 10,
+        ]);
+
+        $response = $this->postJson(
+            "/api/orders/{$order->id}/cancel"
+        );
+
+        $response->assertStatus(422);
+
+        $response->assertJson([
+            'message' => 'Order is already cancelled.',
+        ]);
 
         $this->assertDatabaseHas('products', [
             'id' => $product->id,
