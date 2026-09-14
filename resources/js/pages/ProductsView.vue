@@ -4,6 +4,7 @@ import { useGetProducts } from "../queries/products.js";
 import { toast } from "vue-sonner";
 import ProductListSection from "../section/ProductListSection.vue";
 import CartSection from "../section/CartSection.vue";
+import { useCreateOrder } from "../queries/order.ts";
 
 type Product = {
     id: number;
@@ -16,10 +17,29 @@ type CartItem = {
     product: Product;
     quantity: number;
 };
-
-const { data: products, isPending, isError } = useGetProducts();
-
 const cart = ref<CartItem[]>([]);
+const { data: products, isLoading, isError } = useGetProducts();
+
+const { mutate: createOrder, isPending } = useCreateOrder({
+    onSuccess() {
+        toast.success("Compra efetuada com sucesso!");
+        cart.value = [];
+    },
+});
+
+function checkout(customer_name: string, customer_email: string) {
+    if (!cart || cart.value.length <= 0) {
+        return toast.error("O carrinho está vazio!");
+    }
+    createOrder({
+        customer_email: customer_email,
+        customer_name: customer_name,
+        products: cart.value.map((item) => ({
+            product_id: item.product.id,
+            quantity: item.quantity,
+        })),
+    });
+}
 
 function addToCart(product: Product) {
     if (product.stock <= 0) {
@@ -83,7 +103,7 @@ function decreaseQuantity(productId: number) {
         </template>
         <ProductListSection
             v-else
-            :is-pending="isPending"
+            :is-pending="isLoading"
             :cart="cart"
             :products="products"
             @add-to-cart="addToCart"
@@ -92,6 +112,8 @@ function decreaseQuantity(productId: number) {
 
         <CartSection
             :cart="cart"
+            :is-pending="isPending"
+            @checkout="checkout"
             @remove-from-cart="removeFromCart"
             @increaseQuantity="increaseQuantity"
             @decreaseQuantity="decreaseQuantity"
