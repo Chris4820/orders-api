@@ -2,10 +2,12 @@
 
 namespace App\Filament\Resources\Orders\Tables;
 
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -42,9 +44,25 @@ class OrdersTable
                 //
             ])
             ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
-            ])
+    ViewAction::make(),
+
+    EditAction::make(),
+
+    Action::make('cancel')
+        ->label('Cancelar')
+        ->icon(Heroicon::OutlinedXCircle)
+        ->color('danger')
+        ->requiresConfirmation()
+        ->modalHeading('Cancelar encomenda')
+        ->modalDescription(
+            'Tens a certeza que queres cancelar esta encomenda? O stock dos produtos será reposto.'
+        )
+        ->action(function ($record) {
+            app(\App\Http\Controllers\Api\OrderController::class)
+                ->cancel($record);
+        })
+        ->visible(fn ($record) => $record->status !== 'cancelled'),
+])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
