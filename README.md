@@ -1,58 +1,321 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Mini-API de Encomendas
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Mini-API de encomendas desenvolvida em Laravel como resposta a um exercício técnico.
 
-## About Laravel
+O projecto disponibiliza uma API REST para gestão de produtos e encomendas, um painel administrativo com Filament e um frontend em Vue.js para consulta de produtos e criação de encomendas.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+O foco do projecto foi manter uma implementação simples, estruturada e funcional, dando especial atenção à validação, gestão de stock, consistência dos dados e testes automatizados.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Funcionalidades
 
-## Learning Laravel
+### Produtos
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- Criar produtos
+- Listar produtos
+- Editar produtos
+- Remover produtos através de Soft Delete
+- Gerir preço e stock
+- Seed inicial com 5 produtos
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Encomendas
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+- Criar encomendas através da API
+- Associar vários produtos a uma encomenda
+- Validar produtos existentes
+- Validar stock disponível
+- Actualizar automaticamente o stock após a criação da encomenda
+- Guardar o preço do produto no momento da encomenda
+- Listar encomendas com os respectivos produtos
+- Consultar uma encomenda individual
+- Cancelar encomendas
+- Repor o stock dos produtos após o cancelamento
+- Estados de encomenda:
+    - `pending`
+    - `paid`
+    - `cancelled`
 
-## Agentic Development
+### Administração
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Painel administrativo desenvolvido com Filament para:
 
-```bash
-composer require laravel/boost --dev
+- Gerir produtos
+- Criar e editar produtos
+- Consultar stock e preços
+- Listar encomendas
+- Consultar os detalhes das encomendas
+- Criar e editar encomendas
 
-php artisan boost:install
+### Frontend
+
+Frontend desenvolvido em Vue.js que permite:
+
+- Listar produtos
+- Consultar preços e stock
+- Adicionar produtos ao carrinho
+- Alterar quantidades
+- Remover produtos do carrinho
+- Preencher os dados do cliente
+- Criar uma encomenda
+- Apresentar notificações de sucesso e erro
+
+O checkout utiliza VeeValidate e Zod para validação dos dados.
+
+### Testes
+
+Foram adicionados testes automatizados com PHPUnit para validar os principais fluxos da API, incluindo:
+
+- Gestão de produtos
+- Validação de dados
+- Criação de encomendas
+- Validação de stock
+- Produtos inexistentes
+- Produtos duplicados
+- Cancelamento de encomendas
+- Reposição de stock
+
+### Documentação da API
+
+A API está documentada através de Swagger/OpenAPI.
+
+A documentação pode ser consultada através da rota disponibilizada pelo projecto:
+
+```text
+/api/documentation
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+---
 
-## Contributing
+## Stack
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Backend
 
-## Code of Conduct
+- PHP 8.4
+- Laravel 13
+- Eloquent ORM
+- REST API
+- PHPUnit
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Administração
 
-## Security Vulnerabilities
+- Filament 5
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Frontend
 
-## License
+- Vue 3
+- Vite
+- Tailwind CSS
+- Axios
+- TanStack Vue Query
+- VeeValidate
+- Zod
+- Vue Sonner
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Documentação
+
+- OpenAPI / Swagger
+- L5-Swagger
+
+---
+
+## Requisitos
+
+Para executar o projecto localmente são necessários:
+
+- PHP 8.4 ou compatível com Laravel 13
+- Composer
+- Node.js
+- npm
+- Uma base de dados suportada pelo Laravel
+
+---
+
+## Instalação
+
+Clonar o repositório:
+
+```bash
+git clone https://github.com/Chris4820/orders-api.git
+```
+
+Entrar na pasta do projecto:
+
+```bash
+cd orders-api
+```
+
+### Setup inicial do projeto
+
+Para instalar as dependências, configurar o ambiente e preparar a base de dados, executar na raiz do projeto:
+
+```bash
+composer run setup
+```
+
+Este comando instala as dependências do PHP e JavaScript, cria o ficheiro `.env` caso não exista, gera a chave da aplicação e executa as migrations e os seeders da base de dados.
+
+## Executar o projecto
+
+Iniciar o servidor Laravel:
+
+```bash
+php artisan serve
+```
+
+Noutro terminal, iniciar o Vite:
+
+```bash
+npm run dev
+```
+
+A aplicação ficará disponível, por defeito, em:
+
+```text
+http://localhost:8000
+```
+
+### Frontend
+
+```text
+http://localhost:8000/
+```
+
+### API
+
+```text
+http://localhost:8000/api
+```
+
+### Painel administrativo
+
+```text
+http://localhost:8000/admin
+```
+
+Para criar um utilizador administrador do Filament:
+
+```bash
+php artisan make:filament-user
+```
+
+### Swagger
+
+```text
+http://localhost:8000/api/documentation
+```
+
+## Exemplo de criação de encomenda
+
+`POST /api/orders`
+
+```json
+{
+    "customer_name": "João Silva",
+    "customer_email": "joao@example.com",
+    "products": [
+        {
+            "product_id": 1,
+            "quantity": 2
+        },
+        {
+            "product_id": 2,
+            "quantity": 1
+        }
+    ]
+}
+```
+
+## Gestão de stock
+
+A criação de uma encomenda é executada dentro de uma transacção de base de dados.
+
+Os produtos envolvidos são bloqueados para actualização através de `lockForUpdate()`, evitando que operações concorrentes consumam o mesmo stock de forma inconsistente.
+
+Quando a encomenda é criada:
+
+1. Os produtos são validados.
+2. O stock disponível é verificado.
+3. A encomenda é criada.
+4. Os respectivos `order_items` são criados.
+5. O stock dos produtos é decrementado.
+
+Se alguma operação falhar, a transacção é revertida.
+
+### Cancelamento
+
+Quando uma encomenda é cancelada:
+
+1. Os produtos da encomenda são carregados.
+2. O stock correspondente às quantidades da encomenda é reposto.
+3. O estado da encomenda passa para `cancelled`.
+
+Uma encomenda já cancelada não pode ser cancelada novamente.
+
+---
+
+## Decisões técnicas
+
+### Filament
+
+Foi escolhido o Filament para o dashboard administrativo por permitir construir rapidamente uma interface de administração integrada com os modelos Eloquent.
+
+Desta forma, foi possível concentrar o desenvolvimento na lógica da aplicação e da API, mantendo o backoffice simples e funcional.
+
+### Vue.js
+
+O frontend foi desenvolvido em Vue.js e integrado directamente no projecto Laravel através do Vite.
+
+Esta abordagem permite manter o frontend e o backend no mesmo projecto, enquanto o frontend comunica com a API REST.
+
+### TanStack Vue Query
+
+Foi utilizado o TanStack Vue Query para gerir as operações assíncronas relacionadas com a API, nomeadamente a consulta dos produtos e a criação de encomendas.
+
+Para além de simplificar a gestão dos estados de carregamento e erro, o Vue Query disponibiliza um sistema de cache integrado, permitindo reutilizar dados previamente obtidos e reduzir pedidos HTTP desnecessários à API.
+
+### Validação
+
+A validação é realizada tanto no frontend como no backend.
+
+No frontend, VeeValidate e Zod são utilizados para validar os dados introduzidos no checkout.
+
+No backend, o Laravel valida novamente todos os dados recebidos.
+
+O backend é sempre a fonte de verdade para regras como stock, preços e existência dos produtos.
+
+### Preço histórico
+
+O preço do produto é guardado em `order_items.unit_price` no momento da criação da encomenda.
+
+Isto permite manter o preço histórico da encomenda mesmo que o preço do produto seja alterado posteriormente.
+
+### Soft Delete
+
+Os produtos utilizam Soft Delete para evitar a remoção definitiva de produtos que possam estar associados a encomendas existentes.
+
+Desta forma, é possível preservar o histórico das encomendas.
+
+### Transacções e concorrência
+
+A utilização de transacções e `lockForUpdate()` na criação e cancelamento das encomendas foi uma decisão deliberada para manter a consistência do stock perante operações concorrentes.
+
+---
+
+## Testes
+
+Os testes podem ser executados com:
+
+```bash
+php artisan test
+```
+
+Os testes utilizam `RefreshDatabase`, garantindo que cada execução utiliza uma base de dados de teste isolada.
+
+## Possíveis melhorias
+
+Algumas funcionalidades que poderiam ser adicionadas numa evolução do projecto:
+
+- Gestão de clientes como entidade independente
+- Paginação e filtros nos endpoints de listagem
+- Mais testes de integração e cenários de concorrência
