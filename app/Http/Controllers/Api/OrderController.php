@@ -8,9 +8,18 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use OpenApi\Attributes as OA;
 
 class OrderController extends Controller
 {
+    #[OA\Get(
+        path: '/api/orders',
+        summary: 'Listar todas as encomendas',
+        tags: ['Orders'],
+        responses: [
+            new OA\Response(response: 200, description: 'Sucesso')
+        ]
+    )]
     public function index()
     {
         return response()->json(
@@ -18,6 +27,38 @@ class OrderController extends Controller
         );
     }
 
+    #[OA\Post(
+        path: '/api/orders',
+        summary: 'Criar uma nova encomenda',
+        tags: ['Orders'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['customer_name', 'customer_email', 'products'],
+                properties: [
+                    new OA\Property(property: 'customer_name', type: 'string', example: 'João Silva'),
+                    new OA\Property(property: 'customer_email', type: 'string', example: 'joao@email.com'),
+                    new OA\Property(
+                        property: 'products',
+                        type: 'array',
+                        description: 'Lista de produtos da encomenda',
+                        items: new OA\Items(
+                            type: 'object',
+                            required: ['product_id', 'quantity'],
+                            properties: [
+                                new OA\Property(property: 'product_id', type: 'integer', example: 1),
+                                new OA\Property(property: 'quantity', type: 'integer', example: 2)
+                            ]
+                        )
+                    )
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 201, description: 'Encomenda criada com sucesso'),
+            new OA\Response(response: 422, description: 'Erro de validação ou stock insuficiente')
+        ]
+    )]
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -90,7 +131,24 @@ class OrderController extends Controller
         );
     }
 
-
+    #[OA\Post(
+        path: '/api/orders/{order}/cancel',
+        summary: 'Cancelar uma encomenda',
+        tags: ['Orders'],
+        parameters: [
+            new OA\Parameter(
+                name: 'order',
+                in: 'path',
+                required: true,
+                description: 'ID da encomenda',
+                schema: new OA\Schema(type: 'integer')
+            )
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Encomenda cancelada com sucesso'),
+            new OA\Response(response: 422, description: 'Encomenda já se encontra cancelada')
+        ]
+    )]
     public function cancel(Order $order)
     {
         if ($order->status === 'cancelled') {
@@ -105,7 +163,7 @@ class OrderController extends Controller
             foreach ($order->items as $item) {
                 $item->product->increment(
                     'stock',
-                    $item->quantity
+                    $item['quantity']
                 );
             }
 
